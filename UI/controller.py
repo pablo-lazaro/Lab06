@@ -14,11 +14,12 @@ class Controller:
 
     def handleTopVendite(self, e):
         # 1. Recupero Anno
-        valore_anno = self._view._ddAnno.value
+        valore_anno = self._view._ddAnno.value # Potrei anche mettere la variabile che ho salvato usando una funzione choice
+
         anno = int(valore_anno) if (valore_anno and valore_anno != "Nessun Filtro") else None
 
         # 2. Recupero Brand
-        valore_brand = self._view._ddBrand.value
+        valore_brand = self._view._ddBrand.value # Potrei anche mettere la variabile che ho salvato usando una funzione choice
         brand = valore_brand if (valore_brand and valore_brand != "Nessun Filtro") else None
 
         # 3. Recupero Retailer Code
@@ -40,7 +41,31 @@ class Controller:
 
 
     def handleAnalizzaVendite(self, e):
-        pass
+        self._view.txt_result.controls.clear()
+
+        # Leggiamo i valori dai dropdown
+        anno = self._view._ddAnno.value
+        brand = self._view._ddBrand.value
+        retailer_code = self._view._ddRetailer.value
+
+        # Gestione filtri opzionali per COALESCE
+        # Se il valore è "Nessun Filtro" o None, lo trasformiamo in None per il DB
+        anno_val = int(anno) if (anno and anno != "Nessun Filtro") else None
+        brand_val = brand if (brand and brand != "Nessun Filtro") else None
+        retailer_val = int(retailer_code) if (retailer_code and retailer_code != "Nessun Filtro") else None
+
+        stats = self._model.getStatistiche(anno_val, brand_val, retailer_val)
+
+        if stats and stats['NumeroVendite'] > 0:
+            self._view.txt_result.controls.append(ft.Text("Statistiche vendite:", weight="bold"))
+            self._view.txt_result.controls.append(ft.Text(f"Giro d'affari: {stats['GiroAffari']:.2f}"))
+            self._view.txt_result.controls.append(ft.Text(f"Numero vendite: {stats['NumeroVendite']}"))
+            self._view.txt_result.controls.append(ft.Text(f"Numero retailers coinvolti: {stats['NumeroRetailers']}"))
+            self._view.txt_result.controls.append(ft.Text(f"Numero prodotti coinvolti: {stats['NumeroProdotti']}"))
+        else:
+            self._view.txt_result.controls.append(ft.Text("Nessuna vendita trovata con i filtri selezionati."))
+
+        self._view.update_page()
 
     def fillAnni(self):
         # Recupera i dati dal modello

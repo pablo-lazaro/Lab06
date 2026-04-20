@@ -109,3 +109,31 @@ class DAO():
         cursor.close()
         cnx.close()
         return res
+
+    @staticmethod
+    def getStatisticheVendite(anno, brand, retailer_code):
+        cnx = DBConnect.get_connection()
+        cursor = cnx.cursor(dictionary=True)
+
+        # Query che calcola tutto in un colpo solo
+        query = """
+                SELECT SUM(s.Unit_sale_price * s.Quantity) as GiroAffari, \
+                       COUNT(*)                            as NumeroVendite, \
+                       COUNT(DISTINCT s.Retailer_code)     as NumeroRetailers, \
+                       COUNT(DISTINCT s.Product_number)    as NumeroProdotti
+                FROM go_daily_sales s
+                         JOIN go_products p ON s.Product_number = p.Product_number
+                WHERE YEAR (s.Date) = COALESCE (%s \
+                    , YEAR (s.Date))
+                  AND p.Product_brand = COALESCE (%s \
+                    , p.Product_brand)
+                  AND s.Retailer_code = COALESCE (%s \
+                    , s.Retailer_code) \
+                """
+
+        cursor.execute(query, (anno, brand, retailer_code))
+        res = cursor.fetchone()  # Prendiamo l'unica riga di risultato
+
+        cursor.close()
+        cnx.close()
+        return res

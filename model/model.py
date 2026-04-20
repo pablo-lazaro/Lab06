@@ -16,3 +16,6 @@ class Model:
 
     def getTopVendite(self, anno, brand, retailer_code):
         return DAO.getTopVendite(anno, brand, retailer_code)
+
+    def getStatistiche(self, anno, brand, retailer_code):
+        return DAO.getStatisticheVendite(anno, brand, retailer_code)
