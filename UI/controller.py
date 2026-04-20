@@ -13,7 +13,31 @@ class Controller:
         self._ddRetailerValue = None
 
     def handleTopVendite(self, e):
-        pass
+        # 1. Recupero Anno
+        valore_anno = self._view._ddAnno.value
+        anno = int(valore_anno) if (valore_anno and valore_anno != "Nessun Filtro") else None
+
+        # 2. Recupero Brand
+        valore_brand = self._view._ddBrand.value
+        brand = valore_brand if (valore_brand and valore_brand != "Nessun Filtro") else None
+
+        # 3. Recupero Retailer Code
+        # Se hai salvato la key come r.code nel dropdown:
+        valore_retailer = self._view._ddRetailer.value
+        retailer_code = int(valore_retailer) if (valore_retailer and valore_retailer != "Nessun Filtro") else None
+
+        # Chiamata al model
+        results = self._model.getTopVendite(anno, brand, retailer_code)
+
+        # Pulizia e stampa
+        self._view.txt_result.controls.clear()
+        if not results:
+            self._view.txt_result.controls.append(ft.Text("Nessun risultato trovato."))
+        for v in results:
+            self._view.txt_result.controls.append(ft.Text(v.__str__()))
+        self._view.update_page()
+
+
 
     def handleAnalizzaVendite(self, e):
         pass
@@ -43,7 +67,7 @@ class Controller:
     def fillBrand(self):
 
         # Recupera i dati dal modello
-        prodotti = self._model.getAllProdotti()
+        prodotti = self._model.getAllBrand()
 
         if prodotti is None:
             return
@@ -74,8 +98,8 @@ class Controller:
         for c in retailer:
             # USARE _ddAnno (come definito nella View) e non ddCorsi
             self._view._ddRetailer.options.append(ft.dropdown.Option(
-                key=c,  # La key deve essere una stringa
-                text=c,
+                key=str(c.code),  # La key deve essere una stringa
+                text=c.name,
                 data=c,
                 on_click=self._choiceDDAnno
             ))

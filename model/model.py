@@ -8,8 +8,11 @@ class Model:
     def getAllAnni(self):
         return DAO.getAnni()
 
-    def getAllProdotti(self):
-        return DAO.getProdotti()
+    def getAllBrand(self):
+        return DAO.getBrand()
 
     def getAllRetailer(self):
         return DAO.getRetailer()
+
+    def getTopVendite(self, anno, brand, retailer_code):
+        return DAO.getTopVendite(anno, brand, retailer_code)
