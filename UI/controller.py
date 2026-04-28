@@ -123,7 +123,7 @@ class Controller:
         for c in retailer:
             # USARE _ddAnno (come definito nella View) e non ddCorsi
             self._view._ddRetailer.options.append(ft.dropdown.Option(
-                key=str(c.code),  # La key deve essere una stringa
+                key=c.code,  # La key deve essere una stringa
                 text=c.name,
                 data=c,
                 on_click=self._choiceDDAnno
